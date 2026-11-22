@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Minecraft 分數分物大冒險</title>
+  <!-- 載入 Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 載入適合繁體中文與像素風格的字體 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    /* 全局字體與像素渲染設定 */
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'DotGothic16', sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      /* Minecraft 經典草地與地底泥土方塊背景 */
+      background-color: #3b2a1d;
+      background-image:
+        linear-gradient(to bottom, #5b8731 0px, #5b8731 44px, #466b23 44px, #466b23 56px, #79553a 56px, #79553a 100%),
+        repeating-linear-gradient(90deg, rgba(0,0,0,0.08) 0px, rgba(0,0,0,0.08) 32px, transparent 32px, transparent 64px);
+      background-size: 100% 100%, 64px 64px;
+      color: #f3f4f6;
+    }
+
+    /* 天空雲朵頂部裝飾區 */
+    .mc-sky-header {
+      background: linear-gradient(180deg, #6ca6ff 0%, #99c2ff 100%);
+      border-bottom: 6px solid #3c5a1e;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mc-cloud {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 4px 0 rgba(180, 205, 240, 0.9);
+      pointer-events: none;
+      animation: floatCloud 35s linear infinite;
+    }
+
+    @keyframes floatCloud {
+      0% { transform: translateX(-150px); }
+      100% { transform: translateX(110vw); }
+    }
+
+    /* Minecraft 經典立體石磚/UI 面板邊框 */
+    .mc-panel {
+      background-color: #c6c6c6;
+      color: #1f2937;
+      border: 4px solid #000000;
+      box-shadow:
+        inset 4px 4px 0px #ffffff,
+        inset -4px -4px 0px #555555,
+        0 8px 0 rgba(0, 0, 0, 0.35);
+    }
+
+    .mc-panel-dark {
+      background-color: #262423;
+      color: #f9fafb;
+      border: 4px solid #000000;
+      box-shadow:
+        inset 3px 3px 0px #484543,
+        inset -3px -3px 0px #141312,
+        0 6px 0 rgba(0, 0, 0, 0.45);
+    }
+
+    /* Minecraft 物品欄凹槽風格 */
+    .mc-slot-container {
+      background-color: #8b8b8b;
+      border: 4px solid #373737;
+      box-shadow:
+        inset 4px 4px 0px #373737,
+        inset -4px -4px 0px #ffffff;
+    }
+
+    /* Minecraft 立體按鈕 */
+    .mc-btn {
+      font-family: 'DotGothic16', sans-serif;
+      background-color: #7d7d7d;
+      color: #ffffff;
+      text-shadow: 2px 2px 0px #222222;
+      border: 3px solid #000000;
+      box-shadow:
+        inset 3px 3px 0px #b5b5b5,
+        inset -3px -3px 0px #4a4a4a;
+      transition: transform 0.06s ease, filter 0.1s ease;
+      cursor: pointer;
+    }
+
+    .mc-btn:hover:not(:disabled) {
+      background-color: #8f9e7d;
+      box-shadow:
+        inset 3px 3px 0px #c5d6b0,
+        inset -3px -3px 0px #4d5c3d;
+    }
+
+    .mc-btn:active:not(:disabled) {
+      transform: translateY(2px);
+      box-shadow:
+        inset 3px 3px 0px #4a4a4a,
+        inset -3px -3px 0px #b5b5b5;
+    }
+
+    .mc-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .mc-btn-green {
+      background-color: #3c8527;
+      box-shadow:
+        inset 3px 3px 0px #6bc349,
+        inset -3px -3px 0px #225414;
+    }
+
+    .mc-btn-green:hover:not(:disabled) {
+      background-color: #499e30;
+      box-shadow:
+        inset 3px 3px 0px #82dc5f,
+        inset -3px -3px 0px #2a6619;
+    }
+
+    .mc-btn-gold {
+      background-color: #d98a18;
+      box-shadow:
+        inset 3px 3px 0px #ffcf56,
+        inset -3px -3px 0px #8c5308;
+    }
+
+    .mc-btn-gold:hover:not(:disabled) {
+      background-color: #eb9a24;
+    }
+
+    .mc-btn-red {
+      background-color: #a82828;
+      box-shadow:
+        inset 3px 3px 0px #e05858,
+        inset -3px -3px 0px #691414;
+    }
+
+    /* 經驗值條 */
+    .xp-bar-bg {
+      background-color: #1b2418;
+      border: 3px solid #000000;
+      box-shadow: inset 0 2px 0 #0d120b;
+    }
+
+    .xp-bar-fill {
+      background: linear-gradient(180deg, #a6ff4d 0%, #55cc11 60%, #3a9908 100%);
+      transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* 方格網格與虛線分割器樣式 */
+    .grid-board {
+      display: grid;
+      background-color: #9e9e9e;
+      border: 5px solid #2b2b2b;
+      box-shadow:
+        inset 3px 3px 0 #666666,
+        inset -3px -3px 0 #d4d4d4,
+        0 8px 0 rgba(0,0,0,0.35);
+      padding: 6px;
+      position: relative;
+      margin: 0 auto;
+    }
+
+    .apple-cell {
+      background-color: #8b8b8b;
+      border: 2px solid #757575;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+    }
+
+    /* 階段二：已分群但未選取 */
+    .apple-cell.grouped-ready {
+      cursor: pointer;
+    }
+    .apple-cell.grouped-ready:hover {
+      background-color: #9fa399;
+    }
+
+    /* 階段二：已選取（附魔金蘋果金色發光方格） */
+    .apple-cell.selected-group {
+      background-color: #f7d24c !important;
+      box-shadow: inset 0 0 12px #fff3a1, inset 2px 2px 0 #fff7cc, inset -2px -2px 0 #b8860b;
+      animation: goldPulse 1.8s infinite ease-in-out;
+    }
+
+    @keyframes goldPulse {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.12); }
+    }
+
+    /* 蘋果 SVG 動畫 */
+    .apple-sprite {
+      width: 72%;
+      height: 72%;
+      max-width: 68px;
+      max-height: 68px;
+      image-rendering: pixelated;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      filter: drop-shadow(2px 3px 0px rgba(0, 0, 0, 0.4));
+    }
+
+    .selected-group .apple-sprite {
+      transform: scale(1.12);
+      filter: drop-shadow(0 0 8px rgba(255, 225, 77, 0.95));
+    }
+
+    /* 可點擊的虛線分隔槽 */
+    .cut-line-v {
+      width: 18px;
+      height: 100%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 10;
+    }
+
+    .cut-line-v::before {
+      content: '';
+      width: 4px;
+      height: 88%;
+      border-left: 4px dashed #fef08a;
+      opacity: 0.75;
+      transition: all 0.15s ease;
+    }
+
+    .cut-line-v:hover::before {
+      opacity: 1;
+      border-left-color: #ffffff;
+      transform: scaleX(1.3);
+    }
+
+    /* 已切開的垂直紅石/黑曜石分割線 */
+    .cut-line-v.active::before {
+      border-left: 6px solid #ef4444;
+      box-shadow: 0 0 8px #ef4444, 0 0 2px #000000;
+      height: 104%;
+      opacity: 1;
+    }
+
+    .cut-line-h {
+      height: 18px;
+      width: 100%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 10;
+    }
+
+    .cut-line-h::before {
+      content: '';
+      height: 4px;
+      width: 88%;
+      border-top: 4px dashed #fef08a;
+      opacity: 0.75;
+      transition: all 0.15s ease;
+    }
+
+    .cut-line-h:hover::before {
+      opacity: 1;
+      border-top-color: #ffffff;
+      transform: scaleY(1.3);
+    }
+
+    /* 已切開的水平紅石/黑曜石分割線 */
+    .cut-line-h.active::before {
+      border-top: 6px solid #ef4444;
+      box-shadow: 0 0 8px #ef4444, 0 0 2px #000000;
+      width: 104%;
+      opacity: 1;
+    }
+
+    /* 交叉點裝飾 */
+    .cut-joint {
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cut-joint::after {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background-color: rgba(254, 240, 138, 0.45);
+    }
+
+    /* 步驟標籤徽章 */
+    .step-badge {
+      border: 3px solid #000;
+      padding: 4px 10px;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+    .step-active {
+      background-color: #ffaa00;
+      color: #1a1a1a;
+      box-shadow: inset 2px 2px 0 #ffe066, inset -2px -2px 0 #b37700;
+      transform: translateY(-2px);
+    }
+    .step-done {
+      background-color: #3c8527;
+      color: #ffffff;
+      box-shadow: inset 2px 2px 0 #6bc349, inset -2px -2px 0 #225414;
+    }
+    .step-pending {
+      background-color: #555555;
+      color: #bbbbbb;
+    }
+
+    /* 經驗值綠色光球粒子動畫 */
+    .xp-orb {
+      position: fixed;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #eaff96 15%, #66ff00 60%, #1d8000 100%);
+      box-shadow: 0 0 10px #88ff00;
+      pointer-events: none;
+      z-index: 9999;
+      animation: flyOrb 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes flyOrb {
+      0% {
+        transform: translate(0, 0) scale(0.5);
+        opacity: 1;
+      }
+      70% {
+        opacity: 1;
+      }
+      100% {
+        transform: translate(var(--tx), var(--ty)) scale(1.2);
+        opacity: 0;
+      }
+    }
+
+    /* 數字字體 */
+    .num-font {
+      font-family: 'Press Start 2P', 'DotGothic16', monospace;
+    }
+  </style>
+</head>
+<body class="flex flex-col justify-between">
+
+  <!-- 頂部天空與狀態列 -->
+  <header class="mc-sky-header py-3 px-4 shadow-md">
+    <!-- 裝飾像素雲 -->
+    <div class="mc-cloud w-24 h-6 top-2 left-10"></div>
+    <div class="mc-cloud w-36 h-7 top-6 left-1/2" style="animation-delay: -14s;"></div>
+    <div class="mc-cloud w-28 h-5 top-3 left-3/4" style="animation-delay: -25s;"></div>
+
+    <div class="max-w-5xl mx-auto relative z-10 flex flex-wrap items-center justify-between gap-3">
+      <!-- 標題區 -->
+      <div class="flex items-center gap-3">
+        <!-- 像素草方塊圖示 -->
+        <svg class="w-10 h-10 shrink-0 drop-shadow" viewBox="0 0 16 16">
+          <rect width="16" height="16" fill="#000"/>
+          <rect x="1" y="1" width="14" height="5" fill="#5b8731"/>
+          <rect x="2" y="2" width="4" height="2" fill="#76b03e"/>
+          <rect x="9" y="3" width="5" height="2" fill="#466b23"/>
+          <rect x="1" y="6" width="14" height="9" fill="#866043"/>
+          <rect x="3" y="8" width="3" height="2" fill="#684932"/>
+          <rect x="10" y="10" width="3" height="3" fill="#684932"/>
+          <rect x="5" y="12" width="2" height="2" fill="#9c7252"/>
+        </svg>
+        <div>
+          <h1 class="text-xl sm:text-2xl font-bold text-white tracking-wider" style="text-shadow: 2px 2px 0 #1f330d;">
+            MINECRAFT 分數分物大冒險
+          </h1>
+          <p class="text-xs sm:text-sm text-green-950 font-bold">
+            切開虛線平分蘋果 • 點選金蘋果找答案！
+          </p>
+        </div>
+      </div>
+
+      <!-- 右側工具按鈕 -->
+      <div class="flex items-center gap-2">
+        <button id="btn-level-map" class="mc-btn px-3 py-1.5 text-sm sm:text-base flex items-center gap-1.5" title="選擇關卡">
+          <span>🗺️ 關卡地圖</span>
+          <span id="header-progress-badge" class="bg-amber-500 text-black px-1.5 py-0.5 text-xs font-bold border border-black">1/10</span>
+        </button>
+        <button id="btn-sound" class="mc-btn px-3 py-1.5 text-sm sm:text-base" title="音效開關">
+          🔊 音效開
+        </button>
+      </div>
+    </div>
+
+    <!-- 經驗值等級條 (XP Bar) -->
+    <div class="max-w-5xl mx-auto mt-2.5 relative z-10">
+      <div class="flex items-center justify-between text-xs font-bold text-green-950 mb-0.5 px-1">
+        <span>冒險等級 LV.<span id="xp-level" class="num-font text-sm text-emerald-900">1</span></span>
+        <span>已收集金蘋果：<span id="total-gold-apples" class="text-amber-900 font-extrabold">0</span> 顆</span>
+      </div>
+      <div class="xp-bar-bg w-full h-3.5 relative">
+        <div id="xp-bar-fill" class="xp-bar-fill h-full" style="width: 10%;"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主要遊戲舞台 -->
+  <main class="flex-1 w-full max-w-5xl mx-auto px-3 sm:px-4 py-4 flex flex-col gap-4">
+
+    <!-- 關卡資訊與算式題目面板 -->
+    <section class="mc-panel p-3 sm:p-4">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-3 border-b-2 border-gray-500 pb-3">
+        <!-- 關卡名稱與任務目標 -->
+        <div class="text-center md:text-left">
+          <div class="inline-block bg-emerald-800 text-emerald-100 text-xs sm:text-sm px-2.5 py-0.5 border-2 border-black mb-1">
+            第 <span id="level-num">1</span> 關 / 共 10 關 • <span id="level-title">新手村</span>
+          </div>
+          <p id="level-story" class="text-sm sm:text-base text-gray-800 font-bold">
+            把 4 個蘋果平分成 2 份，拿出其中的 1 份是多少個？
+          </p>
+        </div>
+
+        <!-- 算式展示區 -->
+        <div class="mc-panel-dark px-4 py-2.5 flex items-center gap-2 sm:gap-3 text-2xl sm:text-3xl font-bold shrink-0">
+          <span id="eq-total" class="num-font text-red-400">4</span>
+          <span class="text-gray-300">×</span>
+          <!-- 直式分數 -->
+          <div class="inline-flex flex-col items-center leading-none num-font text-lg sm:text-xl">
+            <span id="eq-num" class="text-amber-400 border-b-2 border-white px-1.5 pb-1">1</span>
+            <span id="eq-den" class="text-sky-300 px-1.5 pt-1">2</span>
+          </div>
+          <span class="text-gray-300">=</span>
+          <!-- 答案輸入框 -->
+          <div class="relative flex items-center">
+            <input
+              id="answer-input"
+              type="number"
+              inputmode="numeric"
+              min="0"
+              max="99"
+              placeholder="?"
+              class="num-font w-16 sm:w-20 h-11 sm:h-12 text-center text-xl sm:text-2xl bg-stone-800 text-amber-300 border-2 border-amber-400 focus:outline-none focus:bg-stone-700"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- 三步驟引導指示燈 -->
+      <div class="grid grid-cols-3 gap-2 pt-3 text-center">
+        <div id="step-badge-1" class="step-badge step-active">
+          <div class="font-bold text-xs sm:text-sm">步驟 1：切分</div>
+          <div class="text-xs hidden sm:block">沿虛線平分成 <span id="step1-den">2</span> 份</div>
+        </div>
+        <div id="step-badge-2" class="step-badge step-pending">
+          <div class="font-bold text-xs sm:text-sm">步驟 2：選份</div>
+          <div class="text-xs hidden sm:block">點擊 <span id="step2-num">1</span> 份變金蘋果</div>
+        </div>
+        <div id="step-badge-3" class="step-badge step-pending">
+          <div class="font-bold text-xs sm:text-sm">步驟 3：作答</div>
+          <div class="text-xs hidden sm:block">數出金蘋果總數</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 互動工作台區（長方形蘋果方格 + 村民提示與操作面板） -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+
+      <!-- 左側/上方：蘋果方格工作區 (佔 7 欄) -->
+      <div class="lg:col-span-7 mc-panel p-4 flex flex-col items-center justify-center min-h-[310px]">
+        <!-- 工作區頂部狀態列 -->
+        <div class="w-full flex flex-wrap items-center justify-between gap-2 mb-3 px-1">
+          <div id="grid-status-pill" class="bg-stone-800 text-amber-300 px-3 py-1 text-sm border-2 border-black">
+            目前切分：尚未切開（共 1 份）
+          </div>
+          <button id="btn-reset-cuts" class="mc-btn mc-btn-red px-3 py-1 text-xs sm:text-sm">
+            🔄 重設切線
+          </button>
+        </div>
+
+        <!-- 動態生成的長方形蘋果虛線方格容器 -->
+        <div class="w-full overflow-x-auto py-2 flex justify-center items-center">
+          <div id="apple-grid-board" class="grid-board"></div>
+        </div>
+
+        <!-- 操作小圖例 -->
+        <div class="mt-3 flex flex-wrap items-center justify-center gap-4 text-xs sm:text-sm text-gray-700 font-bold">
+          <span class="flex items-center gap-1.5">
+            <span class="inline-block w-4 h-1 border-t-4 border-dashed border-yellow-600"></span> 點擊虛線切開
+          </span>
+          <span class="flex items-center gap-1.5">
+            <span class="inline-block w-4 h-1 bg-red-500"></span> 已切分割線
+          </span>
+          <span class="flex items-center gap-1.5">
+            <span class="inline-block w-3.5 h-3.5 bg-amber-300 border border-black"></span> 已選取份數
+          </span>
+        </div>
+      </div>
+
+      <!-- 右側/下方：史蒂夫提示對話框 + 觸控數字鍵盤與確認區 (佔 5 欄) -->
+      <div class="lg:col-span-5 flex flex-col gap-3">
+
+        <!-- 史蒂夫/村民指導員對話框 -->
+        <div class="mc-panel-dark p-3.5 flex items-start gap-3">
+          <!-- 像素史蒂夫頭像 -->
+          <svg class="w-12 h-12 shrink-0 border-2 border-black bg-sky-300" viewBox="0 0 8 8">
+            <rect width="8" height="8" fill="#b8845c"/>
+            <!-- 頭髮 -->
+            <rect x="0" y="0" width="8" height="2" fill="#3b2616"/>
+            <rect x="0" y="2" width="1" height="1" fill="#3b2616"/>
+            <rect x="7" y="2" width="1" height="1" fill="#3b2616"/>
+            <!-- 眼睛 -->
+            <rect x="1" y="3" width="1" height="1" fill="#ffffff"/>
+            <rect x="2" y="3" width="1" height="1" fill="#4637a8"/>
+            <rect x="5" y="3" width="1" height="1" fill="#4637a8"/>
+            <rect x="6" y="3" width="1" height="1" fill="#ffffff"/>
+            <!-- 鼻子與嘴巴 -->
+            <rect x="3" y="4" width="2" height="1" fill="#9c6946"/>
+            <rect x="2" y="5" width="4" height="2" fill="#59351e"/>
+            <rect x="3" y="5" width="2" height="1" fill="#b8845c"/>
+          </svg>
+          <div class="flex-1">
+            <div class="text-xs text-amber-400 font-bold mb-0.5">【指導員史蒂夫】</div>
+            <p id="coach-message" class="text-sm sm:text-base leading-snug text-gray-100">
+              請點擊蘋果之間的<span class="text-yellow-300 font-bold">黃色虛線</span>，把蘋果平均分成 2 份！
+            </p>
+          </div>
+        </div>
+
+        <!-- 算式解析框（答對後顯示） -->
+        <div id="explanation-box" class="hidden mc-panel bg-emerald-100 border-emerald-900 p-3.5 text-emerald-950">
+          <div class="font-bold text-base sm:text-lg text-emerald-800 flex items-center gap-1.5 mb-1">
+            <span>✨ 任務完成！算式解析：</span>
+          </div>
+          <p id="explanation-text" class="text-sm sm:text-base font-bold leading-relaxed"></p>
+        </div>
+
+        <!-- 螢幕像素數字鍵盤（方便平板與觸控白板作答） -->
+        <div class="mc-panel p-3">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs sm:text-sm font-bold text-gray-700">⌨️ 輸入金蘋果數量（支援鍵盤或點擊）：</span>
+          </div>
+          <div class="grid grid-cols-5 gap-1.5 mb-2.5">
+            <button type="button" class="mc-btn py-2 text-lg num-font num-pad-btn" data-val="1">1</button>
+            <button type="button" class="mc-btn py-2 text-lg num-font num-pad-btn" data-val="2">2</button>
+            <button type="button" class="mc-btn py-2 text-lg num-font num-pad-btn" data-val="3">3</button>
+            <button type="button" class="mc-btn py-2 text-lg num-font num-pad-btn" data-val="4">4</button>
+            <button type="button" class="mc-btn py-2 text-lg num-font num-pad-btn" data-val="5">5</button>
+            <button type="button" class="mc-btn py-2 text-lg num-font num-pad-btn" data-val="6">6</button>
+            <button type="button" class="mc-btn py-2 text-lg num-font num-pad-btn" data-val="7">7</button>
+            <button type="button" class="mc-btn py-2 text-lg num-font num-pad-btn" data-val="8">8</button>
+            <button type="button" class="mc-btn py-2 text-lg num-font num-pad-btn" data-val="9">9</button>
+            <button type="button" class="mc-btn py-2 text-lg num-font num-pad-btn" data-val="0">0</button>
+          </div>
+          <div class="grid grid-cols-12 gap-2">
+            <button id="btn-clear-input" type="button" class="col-span-4 mc-btn py-2.5 text-sm sm:text-base">
+              ⌫ 清除
+            </button>
+            <button id="btn-check-answer" type="button" class="col-span-8 mc-btn mc-btn-green py-2.5 text-base sm:text-lg font-bold">
+              ✅ 確認答案
+            </button>
+          </div>
+
+          <!-- 下一關按鈕（答對後出現） -->
+          <button id="btn-next-level" type="button" class="hidden w-full mt-2.5 mc-btn mc-btn-gold py-3 text-lg font-bold animate-bounce">
+            ➡️ 前往下一關！
+          </button>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- 關卡地圖彈窗 Modal -->
+  <div id="modal-level-map" class="fixed inset-0 bg-black/75 z-50 hidden items-center justify-center p-4">
+    <div class="mc-panel max-w-2xl w-full p-5 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b-2 border-gray-500 pb-3 mb-4">
+        <h2 class="text-xl sm:text-2xl font-bold text-gray-900">🗺️ Minecraft 冒險關卡地圖（共 10 關）</h2>
+        <button id="btn-close-map" class="mc-btn mc-btn-red px-3 py-1 text-sm">✖ 關閉</button>
+      </div>
+      <div id="level-grid-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <!-- 由 JS 動態生成 10 關按鈕 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 全部通關結算畫面 Modal -->
+  <div id="modal-victory" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
+    <div class="mc-panel max-w-lg w-full p-6 text-center">
+      <div class="flex justify-center mb-3">
+        <!-- 附魔金蘋果大圖示 -->
+        <svg class="w-20 h-20 animate-bounce" viewBox="0 0 16 16">
+          <rect x="7" y="1" width="2" height="3" fill="#5c3a21"/>
+          <rect x="9" y="2" width="3" height="2" fill="#4aa82c"/>
+          <rect x="4" y="4" width="8" height="2" fill="#ffea54"/>
+          <rect x="3" y="6" width="10" height="6" fill="#ffd026"/>
+          <rect x="4" y="12" width="8" height="2" fill="#d99b00"/>
+          <rect x="5" y="14" width="6" height="1" fill="#a67200"/>
+          <rect x="4" y="5" width="2" height="3" fill="#ffffff"/>
+        </svg>
+      </div>
+      <h2 class="text-2xl sm:text-3xl font-bold text-amber-800 mb-2">
+        🏆 恭喜成為 Minecraft 分數大師！
+      </h2>
+      <p class="text-base text-gray-800 font-bold mb-4">
+        你已經成功通過全部 10 道關卡，完全掌握了「整數乘以分數」的分物秘密！
+      </p>
+      <div class="mc-panel-dark p-4 mb-5 text-left space-y-2 text-sm sm:text-base">
+        <div class="flex justify-between">
+          <span>完成關卡數：</span>
+          <span class="text-emerald-400 font-bold">10 / 10 關</span>
+        </div>
+        <div class="flex justify-between">
+          <span>累積獲得金蘋果：</span>
+          <span id="victory-gold-count" class="text-amber-400 font-bold">0 顆</span>
+        </div>
+        <div class="flex justify-between">
+          <span>最終冒險等級：</span>
+          <span class="text-lime-400 font-bold">LV. 10 附魔大師</span>
+        </div>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <button id="btn-victory-close" class="mc-btn px-5 py-2.5 text-base">
+          查看關卡
+        </button>
+        <button id="btn-restart-all" class="mc-btn mc-btn-green px-5 py-2.5 text-base font-bold">
+          🔄 從第 1 關重新挑戰
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * ============================================================================
+     * 1. 關卡資料庫（共 10 關，由淺入深）
+     * ============================================================================
+     */
+    const LEVELS = [
+      {
+        id: 1,
+        title: "新手村",
+        total: 4,
+        numerator: 1,
+        denominator: 2,
+        rows: 1,
+        cols: 4,
+        story: "史蒂夫採到了 4 個紅蘋果，想平分成 2 份並拿走 1 份，一共有幾個蘋果？"
+      },
+      {
+        id: 2,
+        title: "木斧砍樹",
+        total: 6,
+        numerator: 1,
+        denominator: 3,
+        rows: 1,
+        cols: 6,
+        story: "樹上掉下了 6 個蘋果，請沿虛線平分成 3 份，點選其中的 1 份。"
+      },
+      {
+        id: 3,
+        title: "採集蘋果",
+        total: 6,
+        numerator: 2,
+        denominator: 3,
+        rows: 2,
+        cols: 3,
+        story: "這次 6 個蘋果排成 2 列 3 欄！請平分成 3 份，並選出其中的 2 份。"
+      },
+      {
+        id: 4,
+        title: "石鎬挖礦",
+        total: 8,
+        numerator: 3,
+        denominator: 4,
+        rows: 2,
+        cols: 4,
+        story: "準備進礦坑探險！把 8 個蘋果平分成 4 份，帶走其中的 3 份作為補給。"
+      },
+      {
+        id: 5,
+        title: "農場收成",
+        total: 9,
+        numerator: 2,
+        denominator: 3,
+        rows: 3,
+        cols: 3,
+        story: "正方形的 3×3 農田有 9 個蘋果，可以直切或橫切平分成 3 份，選出 2 份！"
+      },
+      {
+        id: 6,
+        title: "經典練習",
+        total: 10,
+        numerator: 3,
+        denominator: 5,
+        rows: 2,
+        cols: 5,
+        story: "村民交易任務：長方形內有 10 個蘋果，請沿虛線平分成 5 份，再點選其中的 3 份！"
+      },
+      {
+        id: 7,
+        title: "鐵錠熔煉",
+        total: 12,
+        numerator: 1,
+        denominator: 4,
+        rows: 3,
+        cols: 4,
+        story: "儲物箱裡有 12 個蘋果，請平分成 4 份，看看其中的 1 份有幾個蘋果。"
+      },
+      {
+        id: 8,
+        title: "紅石機關",
+        total: 12,
+        numerator: 5,
+        denominator: 6,
+        rows: 2,
+        cols: 6,
+        story: "啟動紅石機關需要 12 個蘋果的 5/6！先平分成 6 份，再點亮 5 份。"
+      },
+      {
+        id: 9,
+        title: "鑽石礦脈",
+        total: 15,
+        numerator: 2,
+        denominator: 5,
+        rows: 3,
+        cols: 5,
+        story: "在深層礦脈找到 15 個蘋果，平分成 5 份後，取走其中的 2 份。"
+      },
+      {
+        id: 10,
+        title: "終界龍挑戰",
+        total: 16,
+        numerator: 3,
+        denominator: 4,
+        rows: 4,
+        cols: 4,
+        story: "最終決戰補給！將 16 個蘋果平分成 4 份，製作 3 份附魔金蘋果迎戰終界龍！"
+      }
+    ];
+
+    /**
+     * ============================================================================
+     * 2. Web Audio API 合成 Minecraft 風格像素音效（無外部音檔依賴）
+     * ============================================================================
+     */
+    class SoundEngine {
+      constructor() {
+        this.enabled = true;
+        this.ctx = null;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) {
+            this.ctx = new AudioContext();
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      playTone(freq, type, duration, delay = 0, gainVal = 0.15) {
+        if (!this.enabled) return;
+        try {
+          this.init();
+          if (!this.ctx) return;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime + delay);
+
+          gain.gain.setValueAtTime(gainVal, this.ctx.currentTime + delay);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + delay + duration);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(this.ctx.currentTime + delay);
+          osc.stop(this.ctx.currentTime + delay + duration);
+        } catch (e) {
+          // 忽略瀏覽器音訊限制錯誤
+        }
+      }
+
+      // 切開虛線音效（清脆方塊敲擊）
+      playCut(isCutting) {
+        if (isCutting) {
+          this.playTone(320, 'square', 0.08, 0, 0.12);
+          this.playTone(480, 'square', 0.08, 0.04, 0.1);
+        } else {
+          this.playTone(260, 'triangle', 0.09, 0, 0.12);
+        }
+      }
+
+      // 完成等分音效
+      playSplitSuccess() {
+        this.playTone(523.25, 'square', 0.1, 0, 0.12);
+        this.playTone(659.25, 'square', 0.1, 0.08, 0.12);
+        this.playTone(783.99, 'square', 0.16, 0.16, 0.14);
+      }
+
+      // 點選金蘋果音效（清亮叮噹）
+      playSelectApple(isSelected) {
+        if (isSelected) {
+          this.playTone(880, 'sine', 0.14, 0, 0.16);
+          this.playTone(1318.5, 'triangle', 0.18, 0.05, 0.12);
+        } else {
+          this.playTone(440, 'sine', 0.1, 0, 0.1);
+        }
+      }
+
+      // 答對升級音效（Minecraft XP 升級和弦）
+      playLevelUp() {
+        const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+        notes.forEach((n, idx) => {
+          this.playTone(n, 'triangle', 0.22, idx * 0.08, 0.16);
+        });
+      }
+
+      // 答錯低沉提示音
+      playError() {
+        this.playTone(180, 'sawtooth', 0.18, 0, 0.14);
+        this.playTone(140, 'sawtooth', 0.24, 0.12, 0.14);
+      }
+    }
+
+    const sfx = new SoundEngine();
+
+    /**
+     * ============================================================================
+     * 3. 遊戲狀態管理
+     * ============================================================================
+     */
+    const state = {
+      currentLevelIdx: 0,
+      completedLevels: new Set(), // 紀錄已通關的關卡索引
+      totalGoldEarned: 0,
+
+      // 當前關卡動態資料
+      vCuts: new Set(), // 垂直切線集合，格式 "r,c" 代表 (r,c) 與 (r,c+1) 之間切開
+      hCuts: new Set(), // 水平切線集合，格式 "r,c" 代表 (r,c) 與 (r+1,c) 之間切開
+      groups: [],       // 二維陣列 cellGroup[r][c] = groupId (0, 1, 2...)
+      groupCount: 1,
+      isEqualSplit: false,
+      selectedGroups: new Set(), // 已選取變為金蘋果的 groupId
+      levelSolved: false
+    };
+
+    /**
+     * ============================================================================
+     * 4. 像素蘋果 SVG 生成器（紅蘋果 & 附魔金蘋果）
+     * ============================================================================
+     */
+    function getAppleSVG(isGold) {
+      if (!isGold) {
+        // Minecraft 像素紅蘋果
+        return `
+          <svg class="apple-sprite" viewBox="0 0 16 16" aria-label="紅蘋果">
+            <!-- 蒂頭與綠葉 -->
+            <rect x="7" y="1" width="2" height="3" fill="#5c3a21"/>
+            <rect x="9" y="2" width="3" height="2" fill="#4aa82c"/>
+            <rect x="10" y="1" width="2" height="1" fill="#6cd948"/>
+            <!-- 蘋果外輪廓與主體 -->
+            <rect x="4" y="4" width="8" height="2" fill="#d92626"/>
+            <rect x="3" y="6" width="10" height="6" fill="#c41919"/>
+            <rect x="4" y="12" width="8" height="2" fill="#991111"/>
+            <rect x="5" y="14" width="6" height="1" fill="#730b0b"/>
+            <!-- 亮面高光 -->
+            <rect x="4" y="5" width="2" height="3" fill="#ff7373"/>
+            <rect x="5" y="5" width="2" height="1" fill="#ffb8b8"/>
+            <!-- 陰影層次 -->
+            <rect x="10" y="7" width="2" height="5" fill="#991111"/>
+          </svg>
+        `;
+      } else {
+        // Minecraft 像素附魔金蘋果
+        return `
+          <svg class="apple-sprite" viewBox="0 0 16 16" aria-label="金蘋果">
+            <!-- 蒂頭與綠葉 -->
+            <rect x="7" y="1" width="2" height="3" fill="#5c3a21"/>
+            <rect x="9" y="2" width="3" height="2" fill="#52c42d"/>
+            <rect x="10" y="1" width="2" height="1" fill="#82f25c"/>
+            <!-- 金蘋果主體 -->
+            <rect x="4" y="4" width="8" height="2" fill="#fff04d"/>
+            <rect x="3" y="6" width="10" height="6" fill="#ffd014"/>
+            <rect x="4" y="12" width="8" height="2" fill="#d99600"/>
+            <rect x="5" y="14" width="6" height="1" fill="#9e6900"/>
+            <!-- 閃亮白色高光 -->
+            <rect x="4" y="5" width="2" height="3" fill="#ffffff"/>
+            <rect x="6" y="5" width="1" height="1" fill="#ffffff"/>
+            <rect x="11" y="9" width="1" height="2" fill="#fff699"/>
+          </svg>
+        `;
+      }
+    }
+
+    /**
+     * ============================================================================
+     * 5. 連通區域計算演算法（BFS 判斷學生切出的份數與每份蘋果數是否相等）
+     * ============================================================================
+     */
+    function analyzePartition() {
+      const level = LEVELS[state.currentLevelIdx];
+      const { rows, cols, denominator } = level;
+
+      const visited = Array.from({ length: rows }, () => Array(cols).fill(false));
+      const groupGrid = Array.from({ length: rows }, () => Array(cols).fill(-1));
+      const groupSizes = [];
+
+      let gId = 0;
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          if (!visited[r][c]) {
+            // BFS 探索同一份內的相連方格
+            const queue = [[r, c]];
+            visited[r][c] = true;
+            groupGrid[r][c] = gId;
+            let count = 0;
+
+            while (queue.length > 0) {
+              const [cr, cc] = queue.shift();
+              count++;
+
+              // 檢查上方 (cr-1, cc) -> 需確認 hCuts 不包含 `${cr-1},${cc}`
+              if (cr > 0 && !visited[cr - 1][cc] && !state.hCuts.has(`${cr - 1},${cc}`)) {
+                visited[cr - 1][cc] = true;
+                groupGrid[cr - 1][cc] = gId;
+                queue.push([cr - 1, cc]);
+              }
+              // 檢查下方 (cr+1, cc) -> 需確認 hCuts 不包含 `${cr},${cc}`
+              if (cr < rows - 1 && !visited[cr + 1][cc] && !state.hCuts.has(`${cr},${cc}`)) {
+                visited[cr + 1][cc] = true;
+                groupGrid[cr + 1][cc] = gId;
+                queue.push([cr + 1, cc]);
+              }
+              // 檢查左方 (cr, cc-1) -> 需確認 vCuts 不包含 `${cr},${cc-1}`
+              if (cc > 0 && !visited[cr][cc - 1] && !state.vCuts.has(`${cr},${cc - 1}`)) {
+                visited[cr][cc - 1] = true;
+                groupGrid[cr][cc - 1] = gId;
+                queue.push([cr, cc - 1]);
+              }
+              // 檢查右方 (cr, cc+1) -> 需確認 vCuts 不包含 `${cr},${cc}`
+              if (cc < cols - 1 && !visited[cr][cc + 1] && !state.vCuts.has(`${cr},${cc}`)) {
+                visited[cr][cc + 1] = true;
+                groupGrid[cr][cc + 1] = gId;
+                queue.push([cr, cc + 1]);
+              }
+            }
+
+            groupSizes.push(count);
+            gId++;
+          }
+        }
+      }
+
+      state.groups = groupGrid;
+      state.groupCount = gId;
+
+      // 判斷是否達成目標等分：份數 == 分母 且 每一份數量完全相同
+      const expectedPerGroup = level.total / denominator;
+      const allEqual = groupSizes.every(sz => sz === expectedPerGroup);
+      const wasEqual = state.isEqualSplit;
+      state.isEqualSplit = (gId === denominator && allEqual);
+
+      // 若剛從未等分變成等分成功，清空舊選取並播放成功音效
+      if (state.isEqualSplit && !wasEqual) {
+        state.selectedGroups.clear();
+        sfx.playSplitSuccess();
+      } else if (!state.isEqualSplit) {
+        state.selectedGroups.clear();
+      }
+
+      updateFeedbackUI(groupSizes);
+    }
+
+    /**
+     * ============================================================================
+     * 6. 介面渲染與狀態更新
+     * ============================================================================
+     */
+    function renderGridBoard() {
+      const level = LEVELS[state.currentLevelIdx];
+      const { rows, cols } = level;
+      const board = document.getElementById('apple-grid-board');
+
+      // 計算每個格子的自適應大小（確保在手機與平板上不超出畫面）
+      const maxBoardWidth = Math.min(window.innerWidth - 64, 520);
+      const cutGap = 18;
+      const availableForCells = maxBoardWidth - (cols - 1) * cutGap - 20;
+      const cellSize = Math.max(46, Math.min(82, Math.floor(availableForCells / cols)));
+
+      // 建立 CSS Grid 模板：方格與分隔線交替排列 (2*cols - 1 欄, 2*rows - 1 列)
+      const colTracks = [];
+      for (let c = 0; c < cols; c++) {
+        colTracks.push(`${cellSize}px`);
+        if (c < cols - 1) colTracks.push(`${cutGap}px`);
+      }
+
+      const rowTracks = [];
+      for (let r = 0; r < rows; r++) {
+        rowTracks.push(`${cellSize}px`);
+        if (r < rows - 1) rowTracks.push(`${cutGap}px`);
+      }
+
+      board.style.gridTemplateColumns = colTracks.join(' ');
+      board.style.gridTemplateRows = rowTracks.join(' ');
+      board.innerHTML = '';
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const gId = state.groups[r][c];
+          const isSelected = state.isEqualSplit && state.selectedGroups.has(gId);
+
+          // 1. 蘋果方格單元
+          const cellDiv = document.createElement('div');
+          cellDiv.className = 'apple-cell';
+          if (state.isEqualSplit) {
+            cellDiv.classList.add('grouped-ready');
+            if (isSelected) {
+              cellDiv.classList.add('selected-group');
+            }
+          }
+          cellDiv.innerHTML = getAppleSVG(isSelected);
+
+          // 點擊方格（當等分完成後，點擊該組任一蘋果可整份變為金蘋果）
+          cellDiv.addEventListener('click', () => {
+            if (!state.isEqualSplit) {
+              // 尚未平分完成時提醒學生先點虛線
+              flashCoachMessage(`還沒平分完成喔！請先點擊方格之間的<span class="text-yellow-300 font-bold">黃色虛線</span>，把蘋果分成 <span class="text-sky-300 font-bold">${level.denominator}</span> 份！`);
+              sfx.playError();
+              return;
+            }
+            toggleSelectGroup(gId);
+          });
+
+          board.appendChild(cellDiv);
+
+          // 2. 右側垂直虛線分割器 (若不是最後一欄)
+          if (c < cols - 1) {
+            const vKey = `${r},${c}`;
+            const vDiv = document.createElement('div');
+            vDiv.className = 'cut-line-v' + (state.vCuts.has(vKey) ? ' active' : '');
+            vDiv.title = '點擊切開或連接虛線';
+            vDiv.addEventListener('click', () => toggleCut('v', vKey));
+            board.appendChild(vDiv);
+          }
+        }
+
+        // 3. 下方水平虛線列 (若不是最後一列)
+        if (r < rows - 1) {
+          for (let c = 0; c < cols; c++) {
+            const hKey = `${r},${c}`;
+            const hDiv = document.createElement('div');
+            hDiv.className = 'cut-line-h' + (state.hCuts.has(hKey) ? ' active' : '');
+            hDiv.title = '點擊切開或連接虛線';
+            hDiv.addEventListener('click', () => toggleCut('h', hKey));
+            board.appendChild(hDiv);
+
+            // 交叉點
+            if (c < cols - 1) {
+              const jointDiv = document.createElement('div');
+              jointDiv.className = 'cut-joint';
+              board.appendChild(jointDiv);
+            }
+          }
+        }
+      }
+    }
+
+    // 切換切線狀態
+    function toggleCut(type, key) {
+      if (state.levelSolved) return; // 已通關鎖定編輯
+
+      const targetSet = type === 'v' ? state.vCuts : state.hCuts;
+      const isAdding = !targetSet.has(key);
+      if (isAdding) {
+        targetSet.add(key);
+      } else {
+        targetSet.delete(key);
+      }
+      sfx.playCut(isAdding);
+      analyzePartition();
+      renderGridBoard();
+    }
+
+    // 切換選取等分區塊（變金蘋果）
+    function toggleSelectGroup(gId) {
+      if (state.levelSolved) return;
+
+      const isSelecting = !state.selectedGroups.has(gId);
+      if (isSelecting) {
+        state.selectedGroups.add(gId);
+      } else {
+        state.selectedGroups.delete(gId);
+      }
+      sfx.playSelectApple(isSelecting);
+      updateFeedbackUI();
+      renderGridBoard();
+    }
+
+    // 更新三步驟徽章、上方狀態條與史蒂夫對話提示
+    function updateFeedbackUI(groupSizes = []) {
+      const level = LEVELS[state.currentLevelIdx];
+      const { total, numerator, denominator } = level;
+      const expectedPerGroup = total / denominator;
+
+      const statusPill = document.getElementById('grid-status-pill');
+      const coachMsg = document.getElementById('coach-message');
+      const b1 = document.getElementById('step-badge-1');
+      const b2 = document.getElementById('step-badge-2');
+      const b3 = document.getElementById('step-badge-3');
+
+      if (!state.isEqualSplit) {
+        // 還在步驟 1：切分階段
+        b1.className = 'step-badge step-active';
+        b2.className = 'step-badge step-pending';
+        b3.className = 'step-badge step-pending';
+
+        if (state.groupCount === 1) {
+          statusPill.innerHTML = `目前切分：尚未切開（共 1 份）`;
+          coachMsg.innerHTML = `請點擊蘋果之間的<span class="text-yellow-300 font-bold">黃色虛線</span>，把 ${total} 個蘋果平均分成 <span class="text-sky-300 font-bold">${denominator}</span> 份（每份 ${expectedPerGroup} 個）！`;
+        } else {
+          const isUniform = groupSizes.every(s => s === groupSizes[0]);
+          statusPill.innerHTML = `目前切分：共 <span class="text-red-400 font-bold">${state.groupCount}</span> 份（目標 ${denominator} 份）`;
+
+          if (!isUniform) {
+            coachMsg.innerHTML = `目前分成了 <span class="text-amber-300 font-bold">${state.groupCount} 份</span>，但<span class="text-red-400 font-bold">每一份的蘋果數量不一樣多</span>喔！請調整切線讓每份都有 ${expectedPerGroup} 個。`;
+          } else if (state.groupCount < denominator) {
+            coachMsg.innerHTML = `每份都有 ${groupSizes[0]} 個很整齊，但目前只有 <span class="text-amber-300 font-bold">${state.groupCount} 份</span>，還需要再切開分成 <span class="text-sky-300 font-bold">${denominator} 份</span>！`;
+          } else {
+            coachMsg.innerHTML = `切太多刀啦！目前分成了 <span class="text-red-400 font-bold">${state.groupCount} 份</span>，請點一下紅線取消多餘的切線，保留 <span class="text-sky-300 font-bold">${denominator} 份</span>。`;
+          }
+        }
+      } else {
+        // 已完成步驟 1，進入步驟 2 或 步驟 3
+        const selCount = state.selectedGroups.size;
+        statusPill.innerHTML = `✅ 已平分 ${denominator} 份 ｜ 已選取：<span class="text-amber-300 font-bold">${selCount} / ${numerator}</span> 份`;
+
+        if (selCount < numerator) {
+          b1.className = 'step-badge step-done';
+          b2.className = 'step-badge step-active';
+          b3.className = 'step-badge step-pending';
+          coachMsg.innerHTML = `太棒了！已經平分成 ${denominator} 份。現在請點擊其中的 <span class="text-amber-300 font-bold">${numerator} 份</span>，讓它們變成發光的金蘋果！（還差 ${numerator - selCount} 份）`;
+        } else if (selCount > numerator) {
+          b1.className = 'step-badge step-done';
+          b2.className = 'step-badge step-active';
+          b3.className = 'step-badge step-pending';
+          coachMsg.innerHTML = `你選了 <span class="text-red-400 font-bold">${selCount} 份</span>，超過分子 <span class="text-amber-300 font-bold">${numerator} 份</span> 囉！請再點一下多選的區塊取消。`;
+        } else {
+          // 選取份數剛好等於分子 -> 進入步驟 3
+          b1.className = 'step-badge step-done';
+          b2.className = 'step-badge step-done';
+          b3.className = 'step-badge step-active';
+          coachMsg.innerHTML = `完美！你已經選出了 ${denominator} 份中的 <span class="text-amber-300 font-bold">${numerator} 份</span>。現在數數看畫面上一共有幾個<span class="text-yellow-300 font-bold">金蘋果</span>，填入下方答案框！`;
+        }
+      }
+    }
+
+    function flashCoachMessage(htmlText) {
+      const coachMsg = document.getElementById('coach-message');
+      coachMsg.innerHTML = htmlText;
+    }
+
+    /**
+     * ============================================================================
+     * 7. 載入指定關卡與作答驗證
+     * ============================================================================
+     */
+    function loadLevel(idx) {
+      state.currentLevelIdx = idx;
+      state.vCuts.clear();
+      state.hCuts.clear();
+      state.selectedGroups.clear();
+      state.isEqualSplit = false;
+      state.levelSolved = false;
+
+      const level = LEVELS[idx];
+
+      // 更新題目文字與算式
+      document.getElementById('level-num').textContent = level.id;
+      document.getElementById('level-title').textContent = level.title;
+      document.getElementById('level-story').textContent = level.story;
+      document.getElementById('header-progress-badge').textContent = `${level.id}/${LEVELS.length}`;
+
+      document.getElementById('eq-total').textContent = level.total;
+      document.getElementById('eq-num').textContent = level.numerator;
+      document.getElementById('eq-den').textContent = level.denominator;
+
+      document.getElementById('step1-den').textContent = level.denominator;
+      document.getElementById('step2-num').textContent = level.numerator;
+
+      // 重設輸入框與隱藏解析
+      const inputEl = document.getElementById('answer-input');
+      inputEl.value = '';
+      inputEl.disabled = false;
+      document.getElementById('explanation-box').classList.add('hidden');
+      document.getElementById('btn-next-level').classList.add('hidden');
+      document.getElementById('btn-check-answer').disabled = false;
+
+      analyzePartition();
+      renderGridBoard();
+      updateTopProgressUI();
+    }
+
+    function checkAnswer() {
+      if (state.levelSolved) return;
+
+      const level = LEVELS[state.currentLevelIdx];
+      const correctAns = (level.total / level.denominator) * level.numerator;
+      const inputEl = document.getElementById('answer-input');
+      const userVal = parseInt(inputEl.value, 10);
+
+      // 引導學生先完成操作步驟
+      if (!state.isEqualSplit) {
+        sfx.playError();
+        flashCoachMessage(`先別急著猜答案！請先點擊<span class="text-yellow-300 font-bold">黃色虛線</span>，把 ${level.total} 個蘋果平分成 ${level.denominator} 份喔！`);
+        return;
+      }
+
+      if (state.selectedGroups.size !== level.numerator) {
+        sfx.playError();
+        flashCoachMessage(`請先在方格中點選出 <span class="text-amber-300 font-bold">${level.numerator} 份</span> 變成金蘋果，再數數看有幾個！`);
+        return;
+      }
+
+      if (isNaN(userVal)) {
+        sfx.playError();
+        flashCoachMessage(`請先在算式後方的框框輸入你數出來的<span class="text-amber-300 font-bold">金蘋果數量</span>！`);
+        inputEl.focus();
+        return;
+      }
+
+      if (userVal === correctAns) {
+        // 答對了！
+        state.levelSolved = true;
+        inputEl.disabled = true;
+        document.getElementById('btn-check-answer').disabled = true;
+
+        // 紀錄通關與金蘋果獎勵
+        if (!state.completedLevels.has(state.currentLevelIdx)) {
+          state.completedLevels.add(state.currentLevelIdx);
+          state.totalGoldEarned += correctAns;
+        }
+
+        sfx.playLevelUp();
+        spawnXPParticles();
+        updateTopProgressUI();
+
+        // 更新步驟 3 徽章為完成
+        document.getElementById('step-badge-3').className = 'step-badge step-done';
+
+        // 顯示白話算式解析
+        const perGroup = level.total / level.denominator;
+        const expBox = document.getElementById('explanation-box');
+        const expText = document.getElementById('explanation-text');
+        expText.innerHTML = `
+          ${level.total} 個蘋果平分成 ${level.denominator} 份，每份有 <span class="underline">${perGroup} 個</span>；<br>
+          拿走其中的 ${level.numerator} 份，共有 ${perGroup} × ${level.numerator} = <span class="text-xl text-amber-700 font-extrabold">${correctAns} 個金蘋果</span>！
+        `;
+        expBox.classList.remove('hidden');
+
+        flashCoachMessage(`🎉 太厲害了！答對就是 <span class="text-amber-300 font-bold">${correctAns}</span>！獲得了 ${correctAns} 顆附魔金蘋果！`);
+
+        // 顯示下一關按鈕或最終破關畫面
+        const nextBtn = document.getElementById('btn-next-level');
+        if (state.currentLevelIdx < LEVELS.length - 1) {
+          nextBtn.textContent = `➡️ 前往第 ${state.currentLevelIdx + 2} 關：${LEVELS[state.currentLevelIdx + 1].title}`;
+          nextBtn.classList.remove('hidden');
+        } else {
+          nextBtn.textContent = `🏆 查看最終破關榮耀結算！`;
+          nextBtn.classList.remove('hidden');
+        }
+      } else {
+        // 答錯了
+        sfx.playError();
+        flashCoachMessage(`數字不太對喔！你輸入了 <span class="text-red-400 font-bold">${userVal}</span>，請再仔細數一數畫面上發光的<span class="text-amber-300 font-bold">金蘋果</span>共有幾顆？`);
+        inputEl.value = '';
+        inputEl.focus();
+      }
+    }
+
+    // 更新頂部經驗值條與金蘋果統計
+    function updateTopProgressUI() {
+      const doneCount = state.completedLevels.size;
+      const pct = Math.max(8, Math.round((doneCount / LEVELS.length) * 100));
+      document.getElementById('xp-bar-fill').style.width = `${pct}%`;
+      document.getElementById('xp-level').textContent = Math.min(10, doneCount + 1);
+      document.getElementById('total-gold-apples').textContent = state.totalGoldEarned;
+    }
+
+    // 噴發經驗值綠色光球粒子特效
+    function spawnXPParticles() {
+      const btnRect = document.getElementById('btn-check-answer').getBoundingClientRect();
+      const targetRect = document.getElementById('xp-bar-fill').getBoundingClientRect();
+
+      for (let i = 0; i < 18; i++) {
+        const orb = document.createElement('div');
+        orb.className = 'xp-orb';
+        const startX = btnRect.left + btnRect.width / 2 + (Math.random() - 0.5) * 80;
+        const startY = btnRect.top + (Math.random() - 0.5) * 40;
+        orb.style.left = `${startX}px`;
+        orb.style.top = `${startY}px`;
+
+        const tx = (targetRect.left + Math.random() * targetRect.width) - startX;
+        const ty = targetRect.top - startY;
+        orb.style.setProperty('--tx', `${tx}px`);
+        orb.style.setProperty('--ty', `${ty}px`);
+        orb.style.animationDelay = `${Math.random() * 0.25}s`;
+
+        document.body.appendChild(orb);
+        setTimeout(() => orb.remove(), 1400);
+      }
+    }
+
+    /**
+     * ============================================================================
+     * 8. 關卡地圖與結算彈窗控制
+     * ============================================================================
+     */
+    function openLevelMap() {
+      const listEl = document.getElementById('level-grid-list');
+      listEl.innerHTML = '';
+
+      LEVELS.forEach((lvl, idx) => {
+        const isDone = state.completedLevels.has(idx);
+        const isCurrent = idx === state.currentLevelIdx;
+
+        const btn = document.createElement('button');
+        btn.className = `mc-btn p-3 text-left flex items-center justify-between ${isDone ? 'mc-btn-green' : ''} ${isCurrent ? 'ring-4 ring-amber-400' : ''}`;
+        btn.innerHTML = `
+          <div>
+            <div class="text-xs text-amber-200 font-bold">第 ${lvl.id} 關 • ${lvl.title}</div>
+            <div class="text-base sm:text-lg font-bold mt-0.5">${lvl.total} × ${lvl.numerator}/${lvl.denominator} = ?</div>
+          </div>
+          <div class="text-xl" title="${isDone ? '已通關' : '未完成'}">
+            ${isDone ? '💎' : (isCurrent ? '⚔️' : '🔒')}
+          </div>
+        `;
+        btn.addEventListener('click', () => {
+          document.getElementById('modal-level-map').classList.add('hidden');
+          document.getElementById('modal-level-map').classList.remove('flex');
+          loadLevel(idx);
+        });
+        listEl.appendChild(btn);
+      });
+
+      const modal = document.getElementById('modal-level-map');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function showVictoryModal() {
+      document.getElementById('victory-gold-count').textContent = `${state.totalGoldEarned} 顆`;
+      const modal = document.getElementById('modal-victory');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    /**
+     * ============================================================================
+     * 9. 事件綁定與初始化
+     * ============================================================================
+     */
+    window.addEventListener('DOMContentLoaded', () => {
+      // 載入第 1 關
+      loadLevel(0);
+
+      // 重設切線按鈕
+      document.getElementById('btn-reset-cuts').addEventListener('click', () => {
+        if (state.levelSolved) return;
+        state.vCuts.clear();
+        state.hCuts.clear();
+        state.selectedGroups.clear();
+        sfx.playCut(false);
+        analyzePartition();
+        renderGridBoard();
+      });
+
+      // 螢幕數字鍵盤
+      document.querySelectorAll('.num-pad-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (state.levelSolved) return;
+          const inputEl = document.getElementById('answer-input');
+          if (inputEl.value.length < 2) {
+            inputEl.value += btn.dataset.val;
+          }
+          sfx.playTone(600, 'square', 0.05, 0, 0.08);
+        });
+      });
+
+      // 清除輸入
+      document.getElementById('btn-clear-input').addEventListener('click', () => {
+        if (state.levelSolved) return;
+        document.getElementById('answer-input').value = '';
+        sfx.playTone(300, 'square', 0.05, 0, 0.08);
+      });
+
+      // 確認答案按鈕與 Enter 鍵支援
+      document.getElementById('btn-check-answer').addEventListener('click', checkAnswer);
+      document.getElementById('answer-input').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          checkAnswer();
+        }
+      });
+
+      // 下一關按鈕
+      document.getElementById('btn-next-level').addEventListener('click', () => {
+        if (state.currentLevelIdx < LEVELS.length - 1) {
+          loadLevel(state.currentLevelIdx + 1);
+        } else {
+          showVictoryModal();
+        }
+      });
+
+      // 音效開關
+      const soundBtn = document.getElementById('btn-sound');
+      soundBtn.addEventListener('click', () => {
+        sfx.enabled = !sfx.enabled;
+        soundBtn.textContent = sfx.enabled ? '🔊 音效開' : '🔇 靜音中';
+        if (sfx.enabled) sfx.playSelectApple(true);
+      });
+
+      // 關卡地圖彈窗開關
+      document.getElementById('btn-level-map').addEventListener('click', openLevelMap);
+      document.getElementById('btn-close-map').addEventListener('click', () => {
+        const modal = document.getElementById('modal-level-map');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      });
+
+      // 破關結算彈窗按鈕
+      document.getElementById('btn-victory-close').addEventListener('click', () => {
+        const modal = document.getElementById('modal-victory');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      });
+
+      document.getElementById('btn-restart-all').addEventListener('click', () => {
+        state.completedLevels.clear();
+        state.totalGoldEarned = 0;
+        const modal = document.getElementById('modal-victory');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        loadLevel(0);
+      });
+
+      // 視窗大小改變時重新調整方格尺寸
+      window.addEventListener('resize', () => {
+        renderGridBoard();
+      });
+    });
+  </script>
+</body>
+</html>
